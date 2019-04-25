@@ -26,6 +26,32 @@ int main(int argc, char ** argv)
 		char *contentLength = FCGX_GetParam("CONTENT_LENGTH", envp);
 		int len = 0;
 
+#if 0 // for test
+/*
+		FCGX_FPrintF(out, "Content-type: text/html\r\n"
+			"\r\n"
+			"<title>FastCGI Hello!</title>"
+			"<h1>FastCGI Hello!</h1>"
+			"<div>Request number %d running on host : %s </div>\n"
+			"<div>QUERY_STRING : %s\n</div>"
+			"<div>REMOTE_ADDR : %s\n</div>"
+			"<div>REMOTE_PORT : %s\n</div>"
+			"<div>REQUEST_METHOD : %s\n</div>"
+			"<div>CONTENT_TYPE : %s\n</div>"
+			"<div>CONTENT_LENGTH : %s\n</div>"
+			"<div>SERVER_PROTOCOL : %s\n</div>"
+			"<div>REQUEST_URI : %s\n</div>"
+			"<div>SERVER_SOFTWARE : %s\n</div>",
+			++count, getenv("SERVER_NAME"),getenv("QUERY_STRING"),
+			getenv("REMOTE_ADDR"), getenv("REMOTE_PORT"), getenv("REQUEST_METHOD"),
+			getenv("CONTENT_TYPE"),getenv("CONTENT_LENGTH"),getenv("REQUEST_URI"),
+			getenv("SERVER_PROTOCOL"), getenv("SERVER_SOFTWARE")
+		);
+		*/
+		FCGX_FPrintF(out, "Content-type: text/html\r\n\r\n %d, %d", ++count, getpid());
+		continue;
+#endif
+
 		FCGX_FPrintF(out,
 			"Content-type: text/html\r\n"
 			"\r\n");
@@ -33,18 +59,19 @@ int main(int argc, char ** argv)
 		if (contentLength != NULL)
 			len = strtol(contentLength, NULL, 10);
 
-		if (len > 0)  //(len > 0)  // (1) 
+		if (1)//(len > 0)  //(len > 0)  // (1) 
 		{
-#if 0  // TEST
+#if 1  // TEST
 			std::string testdata, testtext("5411");
-			testdata += "<xml>";
-			testdata += "<ToUserName><![CDATA[test_data1]]></ToUserName>";
-			testdata += "<FromUserName><![CDATA[test_data2]]></FromUserName>";
-			testdata += "<CreateTime>0</CreateTime>";
-			testdata += "<MsgType><![CDATA[text]]></MsgType>";
-			testdata += "<Content><![CDATA[" + testtext + "]]></Content>";
-			testdata += "<FuncFlag>0</FuncFlag>";
-			testdata += "</xml>";
+			testdata += "<xml>\r\n";
+			testdata += "<ToUserName><![CDATA[test_data1]]></ToUserName>\r\n";
+			testdata += "<FromUserName><![CDATA[test_data2]]></FromUserName>\r\n";
+			testdata += "<CreateTime>0</CreateTime>\r\n";
+			testdata += "<MsgType><![CDATA[text]]></MsgType>\r\n";
+			testdata += "<Content><![CDATA[" + testtext + "]]></Content>\r\n";
+			testdata += "<FuncFlag>0</FuncFlag>\r\n";
+			testdata += "</xml>\r\n";
+			
 			len = testdata.length() + 1;
 #endif
 
@@ -56,7 +83,7 @@ int main(int argc, char ** argv)
 			}
 
 			memset(content, 0, len + 1);
-#if 0	// TEST
+#if 1	// TEST
 			strcpy(content, testdata.c_str());
 #else
 			FCGX_GetStr(content, len, in);
@@ -67,6 +94,12 @@ int main(int argc, char ** argv)
 			if (retstr.length())
 			{
 				// FCGX_FPrintF(out, retstr.c_str());  // 这个有长度限制
+				
+				char tmpstr[64];
+			sprintf(tmpstr, "%d pid=%d", ++count, getpid());
+			retstr += tmpstr;
+			
+			
 				size_t outlen = retstr.length();
 				for (size_t i = 0; i < outlen; i++) {
 					FCGX_PutChar((retstr.c_str())[i], out);
@@ -230,4 +263,7 @@ static void processXmlInput(char * content, std::string & ret)
 		}
 	}
 }
+
+
+
 
