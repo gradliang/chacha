@@ -63,14 +63,14 @@ int main(int argc, char ** argv)
 		{
 #if 1  // TEST
 			std::string testdata, testtext("5411");
-			testdata += "<xml>\r\n";
-			testdata += "<ToUserName><![CDATA[test_data1]]></ToUserName>\r\n";
-			testdata += "<FromUserName><![CDATA[test_data2]]></FromUserName>\r\n";
-			testdata += "<CreateTime>0</CreateTime>\r\n";
-			testdata += "<MsgType><![CDATA[text]]></MsgType>\r\n";
-			testdata += "<Content><![CDATA[" + testtext + "]]></Content>\r\n";
-			testdata += "<FuncFlag>0</FuncFlag>\r\n";
-			testdata += "</xml>\r\n";
+			testdata += "<xml>";
+			testdata += "<ToUserName><![CDATA[test_data1]]></ToUserName>";
+			testdata += "<FromUserName><![CDATA[test_data2]]></FromUserName>";
+			testdata += "<CreateTime>0</CreateTime>";
+			testdata += "<MsgType><![CDATA[text]]></MsgType>";
+			testdata += "<Content><![CDATA[" + testtext + "]]></Content>";
+			testdata += "<FuncFlag>0</FuncFlag>";
+			testdata += "</xml>";
 			
 			len = testdata.length() + 1;
 #endif
