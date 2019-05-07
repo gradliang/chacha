@@ -62,7 +62,7 @@ int main(int argc, char ** argv)
 		if (1)//(len > 0)  //(len > 0)  // (1) 
 		{
 #if 1  // TEST
-			std::string testdata, testtext("5411");
+			std::string testdata, testtext("308");
 			testdata += "<xml>";
 			testdata += "<ToUserName><![CDATA[test_data1]]></ToUserName>";
 			testdata += "<FromUserName><![CDATA[test_data2]]></FromUserName>";
@@ -94,11 +94,6 @@ int main(int argc, char ** argv)
 			if (retstr.length())
 			{
 				// FCGX_FPrintF(out, retstr.c_str());  // 这个有长度限制
-				
-				char tmpstr[64];
-			sprintf(tmpstr, "%d pid=%d", ++count, getpid());
-			retstr += tmpstr;
-			
 			
 				size_t outlen = retstr.length();
 				for (size_t i = 0; i < outlen; i++) {

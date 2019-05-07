@@ -140,7 +140,23 @@ std::wstring findBank(wchar_t * str)
 	const bankinfo * it;
 	unsigned bucketSize;
 
-	crc = crc32_hash((unsigned char*)str, wcslen(str) * sizeof(wchar_t));
+	unsigned short * pstr16;
+	
+#ifdef WIN32
+	pstr16 = str;
+#else
+	int k = 0;
+	unsigned short bankstr16[8];
+	memset(bankstr16, 0, sizeof(bankstr16));
+	while (str[k] && k < 8)
+	{
+		bankstr16[k] = (unsigned short) str[k];
+		k++;
+	}
+	pstr16 = bankstr16;
+#endif // WIN32
+
+	crc = crc32_hash((unsigned char*)pstr16, wcslen(str) * sizeof(wchar_t));
 	idx = crc % BANK_HASH_TABLE_SIZE;
 	pInfos = bankinfo_buckets[idx];
 	bucketSize = bank_bucket_size[idx];
@@ -251,8 +267,23 @@ std::wstring findMCC(wchar_t * str)
 	const mccinfo * it;
 	const mccinfo * infos;
 	unsigned i, bucketSize;
+	unsigned short * pstr16;
+	
+#ifdef WIN32
+	pstr16 = str;
+#else
+	int k = 0;
+	unsigned short mccstr16[8];
+	memset(mccstr16, 0, sizeof(mccstr16));
+	while (str[k] && k < 8)
+	{
+		mccstr16[k] = (unsigned short) str[k];
+		k++;
+	}
+	pstr16 = mccstr16;
+#endif // WIN32
 
-	crc32 = crc32_hash((unsigned char*)str, wcslen(str) * sizeof(wchar_t));
+	crc32 = crc32_hash((unsigned char*)pstr16, wcslen(str) * sizeof(unsigned short));
 	idx = crc32 % MCC_HASH_TABLE_SIZE;
 	infos = mccinfo_buckets[idx];
 	bucketSize = mcc_bucket_size[idx];
