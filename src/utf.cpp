@@ -53,7 +53,7 @@ int wstring_to_utf8(char * u8s, size_t u8size, const wchar_t * u32s)
 	size_t srclen = (wcslen(u32s) + 1) * sizeof(wchar_t);
 	size_t dstlen = u8size;
 	
-	iconv_t conv = iconv_open("UTF-32LE", "UTF-8");
+	iconv_t conv = iconv_open("UTF-8", "UTF-32LE");
 	iconv(conv, (char**)(&u32s_copy), &srclen, (char**)(&u8s_copy), &dstlen);
     iconv_close(conv);
 	return 0;
