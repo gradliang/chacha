@@ -62,7 +62,7 @@ int main(int argc, char ** argv)
 		if (1)//(len > 0)  //(len > 0)  // (1) 
 		{
 #if 1  // TEST
-			std::string testdata, testtext("308");
+			std::string testdata, testtext("105440859128416");
 			testdata += "<xml>";
 			testdata += "<ToUserName><![CDATA[test_data1]]></ToUserName>";
 			testdata += "<FromUserName><![CDATA[test_data2]]></FromUserName>";
