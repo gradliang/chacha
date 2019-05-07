@@ -156,7 +156,7 @@ std::wstring findBank(wchar_t * str)
 	pstr16 = bankstr16;
 #endif // WIN32
 
-	crc = crc32_hash((unsigned char*)pstr16, wcslen(str) * sizeof(wchar_t));
+	crc = crc32_hash((unsigned char*)pstr16, wcslen(str) * sizeof(unsigned short));
 	idx = crc % BANK_HASH_TABLE_SIZE;
 	pInfos = bankinfo_buckets[idx];
 	bucketSize = bank_bucket_size[idx];
