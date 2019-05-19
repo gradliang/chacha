@@ -11,6 +11,7 @@
 
 static void InitProgram();
 static void processXmlInput(char * content, std::string & ret);
+static int getEchoStr(const char * queryStr, char * echoStr);
 
 int main(int argc, char ** argv)
 {
@@ -23,7 +24,8 @@ int main(int argc, char ** argv)
 	while (FCGX_Accept(&in, &out, &err, &envp) >= 0) 
 	{
 		char * content = NULL;
-		char *contentLength = FCGX_GetParam("CONTENT_LENGTH", envp);
+		char * contentLength = FCGX_GetParam("CONTENT_LENGTH", envp);
+		char * queryStr = FCGX_GetParam("QUERY_STRING",  envp);
 		int len = 0;
 
 #if 0 // for test
@@ -48,7 +50,7 @@ int main(int argc, char ** argv)
 			getenv("SERVER_PROTOCOL"), getenv("SERVER_SOFTWARE")
 		);
 		*/
-		FCGX_FPrintF(out, "Content-type: text/html\r\n\r\n %d, %d", ++count, getpid());
+		FCGX_FPrintF(out, "Content-type: text/html\r\n\r\n  %d, %d", ++count, getpid());
 		continue;
 #endif
 
@@ -58,10 +60,23 @@ int main(int argc, char ** argv)
 
 		if (contentLength != NULL)
 			len = strtol(contentLength, NULL, 10);
-
-		if (1)//(len > 0)  //(len > 0)  // (1) 
+			
+		// wechat first time check
+		if (queryStr != NULL) 
 		{
-#if 1  // TEST
+			char echoStr[256];
+			memset(echoStr, 0, sizeof(echoStr));
+			
+			getEchoStr(queryStr, echoStr);
+			if (echoStr[0]) {
+				FCGX_FPrintF(out, queryStr);
+				continue;
+			}
+		}
+
+		if (len > 0)  //(len > 0)  // (1) 
+		{
+#if 0  // TEST
 			std::string testdata, testtext("105440859128416");
 			testdata += "<xml>";
 			testdata += "<ToUserName><![CDATA[test_data1]]></ToUserName>";
@@ -83,7 +98,7 @@ int main(int argc, char ** argv)
 			}
 
 			memset(content, 0, len + 1);
-#if 1	// TEST
+#if 0// TEST
 			strcpy(content, testdata.c_str());
 #else
 			FCGX_GetStr(content, len, in);
@@ -259,6 +274,53 @@ static void processXmlInput(char * content, std::string & ret)
 	}
 }
 
-
+int getEchoStr(const char * queryStr, char * echoStr)
+{
+	char key[256];
+	char value[256];
+	char ch;
+	char * nows;
+	size_t cnt, i;
+	
+	if (queryStr == NULL)
+		return 0;
+	
+	nows = key;
+	i = 0;
+	cnt = 0;
+	while (1)
+	{
+		ch = queryStr[i];
+		if (ch == '&' || ch == 0)
+		{
+			nows = key;
+			cnt = 0;
+			
+			if (0 == strcmp(key, "echostr"))
+			{
+				strncpy(echoStr, value, 256);
+				return 0;
+			}
+			
+			if (ch == 0)
+				return 0;
+		}
+		else if (ch == '=')
+		{
+			nows = value;
+			cnt = 0;
+		}
+		else
+		{
+			nows[cnt++] = ch;
+			nows[cnt] = 0;
+		}
+		
+		if (cnt >= 255)
+			break;
+	}
+	
+	return 0;
+}
 
 
