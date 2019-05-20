@@ -24,8 +24,11 @@ int main(int argc, char ** argv)
 	while (FCGX_Accept(&in, &out, &err, &envp) >= 0) 
 	{
 		char * content = NULL;
+		
 		char * contentLength = FCGX_GetParam("CONTENT_LENGTH", envp);
 		char * queryStr = FCGX_GetParam("QUERY_STRING",  envp);
+		char * methodStr = FCGX_GetParam("REQUEST_METHOD",  envp);
+		
 		int len = 0;
 
 #if 0 // for test
@@ -62,17 +65,29 @@ int main(int argc, char ** argv)
 			len = strtol(contentLength, NULL, 10);
 			
 		// wechat first time check
-		if (queryStr != NULL) 
+		if (methodStr != NULL && queryStr != NULL && 0 == strcmp(methodStr, "GET")) 
 		{
 			char echoStr[256];
 			memset(echoStr, 0, sizeof(echoStr));
 			
 			getEchoStr(queryStr, echoStr);
 			if (echoStr[0]) {
-				FCGX_FPrintF(out, queryStr);
+				//FCGX_FPrintF(out, queryStr);
+				FCGX_FPrintF(out, echoStr);
 				continue;
 			}
 		}
+		
+		/*
+		FCGX_FPrintF(out, "<pre>");
+		int ii = 0;
+		for (ii = 0; envp[ii]; ii++)
+		{
+			FCGX_FPrintF(out, "%s\r\n", envp[ii]);
+		}
+		FCGX_FPrintF(out, "</pre>");
+		continue;
+		*/
 
 		if (len > 0)  //(len > 0)  // (1) 
 		{
@@ -276,8 +291,8 @@ static void processXmlInput(char * content, std::string & ret)
 
 int getEchoStr(const char * queryStr, char * echoStr)
 {
-	char key[256];
-	char value[256];
+	char key[256] = {0};
+	char value[256] = {0};
 	char ch;
 	char * nows;
 	size_t cnt, i;
@@ -290,7 +305,7 @@ int getEchoStr(const char * queryStr, char * echoStr)
 	cnt = 0;
 	while (1)
 	{
-		ch = queryStr[i];
+		ch = queryStr[i++];
 		if (ch == '&' || ch == 0)
 		{
 			nows = key;
